@@ -18,30 +18,40 @@ const float phase_rad = 0;    //3.14 / 4;
 //      |
 
 #include <TimerTCC0.h>
-bool timer_100Hz = false;
+bool timer_250Hz = false;
 
 #include <IcsHardSerialClass.h>
 
 const byte EN_PIN = 3;
 const long BAUDRATE = 115200;
-const int TIMEOUT = 1000;    //通信できてないか確認用にわざと遅めに設定
+const int TIMEOUT = 100;    //通信できてないか確認用にわざと遅めに設定
 
 IcsHardSerialClass krs(&Serial1, EN_PIN, BAUDRATE, TIMEOUT); //インスタンス＋ENピン(2番ピン)およびUARTの指定
 
 void setup() {
+  analogReadResolution(12);
   krs.begin();  //サーボモータの通信初期設定
-  //100HzでtimerIsrを呼び出し
-  TimerTcc0.initialize(10000);//10,000us=100Hz
+  //250HzでtimerIsrを呼び出し
+  TimerTcc0.initialize(4000);//4,000us=250Hz
   TimerTcc0.attachInterrupt(timerIsr);
 }
 
 void loop() {
-  if (timer_100Hz) {
-    timer_100Hz = false;
-    servo_write_degree(control_curve_degree(stick_normalized()));
+  
+  uint32_t adjust_raw10 = 0;
+  for (int i = 0; i < 10; i++) {
+    adjust_raw10 += analogRead(ADJUST);
+  }
+  float adjust = ((float)(adjust_raw10/10) -1024.0) / 2048;  //  -1.0 ~ +1.0
+  
+  float offset_deg=adjust*20;
+  
+  if (timer_250Hz) {
+    timer_250Hz = false;
+  //servo_write_degree(control_curve_degree(stick_normalized())+offset_deg);
+  servo_write_degree(offset_deg);
   }
 }
-
 
 void servo_write_degree(float degree) { //get degree -range_deg ~ +range_deg, control servo
   int servo_val = servo_zero_pos + (2000 * degree / 135);
@@ -49,7 +59,7 @@ void servo_write_degree(float degree) { //get degree -range_deg ~ +range_deg, co
     servo_val = servo_zero_pos;
   }
   krs.setPos(0, servo_val);
-  Serial.println(servo_val);
+  //Serial.println(servo_val);
 }
 
 float control_curve_degree(float val_normalized) { //get -1 ~ +1 , return degree -range_deg ~ +range_deg
@@ -83,9 +93,9 @@ float stick_normalized() { //return -1 ~ +1
 
 void timerIsr()
 {
-  if (timer_100Hz) {
-    //Serial.println("100Hz overrun");
+  if (timer_250Hz) {
+    //Serial.println("250Hz overrun");
   } else {
-    timer_100Hz = true;
+    timer_250Hz = true;
   }
 }
