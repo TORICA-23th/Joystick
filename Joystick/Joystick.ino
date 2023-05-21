@@ -37,27 +37,28 @@ void setup() {
 }
 
 void loop() {
-  
+
   uint32_t adjust_raw10 = 0;
   for (int i = 0; i < 10; i++) {
     adjust_raw10 += analogRead(ADJUST);
   }
-  float adjust = ((float)(adjust_raw10/10) -1024.0) / 2048;  //  -1.0 ~ +1.0
-  
-  float offset_deg=adjust*20;
-  
+  float adjust = ((float)(adjust_raw10 / 10) - 1024.0) / 2048; //  -1.0 ~ +1.0
+
+  float offset_deg = adjust * 20;
+
   if (timer_250Hz) {
     timer_250Hz = false;
-  //servo_write_degree(control_curve_degree(stick_normalized())+offset_deg);
-  servo_write_degree(offset_deg);
+    //servo_write(control_curve_degree(stick_normalized())+offset_deg);
+    servo_write(offset_deg);
   }
 }
 
-void servo_write_degree(float degree) { //get degree -range_deg ~ +range_deg, control servo
+void servo_write(float degree) { //get degree -range_deg ~ +range_deg, control servo
   int servo_val = servo_zero_pos + (2000 * degree / 135);
-  if (abs(servo_val - servo_zero_pos) < 10) {
+  /*
+    if (abs(servo_val - servo_zero_pos) < 10) {
     servo_val = servo_zero_pos;
-  }
+    }*/
   krs.setPos(0, servo_val);
   //Serial.println(servo_val);
 }
