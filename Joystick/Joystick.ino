@@ -18,7 +18,7 @@ const float phase_rad = 0;    //3.14 / 4;
 //      |
 
 #include <TimerTCC0.h>
-bool timer_250Hz = false;
+bool timer_100Hz = false;
 
 #include <IcsHardSerialClass.h>
 
@@ -31,8 +31,8 @@ IcsHardSerialClass krs(&Serial1, EN_PIN, BAUDRATE, TIMEOUT); //インスタン�
 void setup() {
   analogReadResolution(12);
   krs.begin();  //サーボモータの通信初期設定
-  //250HzでtimerIsrを呼び出し
-  TimerTcc0.initialize(4000);//4,000us=250Hz
+  //100HzでtimerIsrを呼び出し
+  TimerTcc0.initialize(10000);//10,000us=100Hz
   TimerTcc0.attachInterrupt(timerIsr);
 }
 
@@ -46,10 +46,10 @@ void loop() {
 
   float offset_deg = adjust * 20;
 
-  if (timer_250Hz) {
-    timer_250Hz = false;
-    //servo_write(control_curve_degree(stick_normalized())+offset_deg);
-    servo_write(offset_deg);
+  if (timer_100Hz) {
+    timer_100Hz = false;
+    servo_write(control_curve_degree(stick_normalized())+offset_deg);
+    //servo_write(offset_deg);
   }
 }
 
@@ -94,9 +94,9 @@ float stick_normalized() { //return -1 ~ +1
 
 void timerIsr()
 {
-  if (timer_250Hz) {
-    //Serial.println("250Hz overrun");
+  if (timer_100Hz) {
+    //Serial.println("100Hz overrun");
   } else {
-    timer_250Hz = true;
+    timer_100Hz = true;
   }
 }
