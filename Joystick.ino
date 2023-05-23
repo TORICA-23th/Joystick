@@ -4,11 +4,11 @@
 #define LED_YELLOW  LED_BUILTIN
 #define LED_BLUE    PIN_LED_RXL
 
-const int servo_zero_pos = 7500;
-const float stick_x_zero_raw = 2055.0;
-const float stick_y_zero_raw = 2065.0;
-
+// 動作範囲・オフセット範囲設定
 const float range_deg = 30.0; // -range_deg ~ +range_deg
+const float max_offset_deg = 20.0;
+
+// ジョイスティックの操作方向指定
 const float phase_rad = 0;    //3.14 / 4;
 //      y
 //      |  pi/4
@@ -17,40 +17,41 @@ const float phase_rad = 0;    //3.14 / 4;
 //      |
 //      |
 
-#include <TimerTCC0.h>
-bool timer_100Hz = false;
+// ジョイスティックのゼロ点調整
+const float stick_x_zero_raw = 2055.0;
+const float stick_y_zero_raw = 2065.0;
 
 #include <IcsHardSerialClass.h>
 
 const byte EN_PIN = 3;
 const long BAUDRATE = 115200;
 const int TIMEOUT = 100;    //通信できてないか確認用にわざと遅めに設定
-
 IcsHardSerialClass krs(&Serial1, EN_PIN, BAUDRATE, TIMEOUT); //インスタンス＋ENピン(2番ピン)およびUARTの指定
+const int servo_zero_pos = 7500;
 
 void setup() {
   analogReadResolution(12);
   krs.begin();  //サーボモータの通信初期設定
-  //100HzでtimerIsrを呼び出し
-  TimerTcc0.initialize(10000);//10,000us=100Hz
-  TimerTcc0.attachInterrupt(timerIsr);
 }
 
 void loop() {
+  uint32_t now_time = millis();
+  static uint32_t last_time = 0;
+  if (now_time - last_time >= 10) {
+    last_time = now_time;
 
+    servo_write(read_offset_deg() + control_curve_degree(stick_normalized()));
+  }
+}
+
+float read_offset_deg() {
   uint32_t adjust_raw10 = 0;
   for (int i = 0; i < 10; i++) {
     adjust_raw10 += analogRead(ADJUST);
   }
   float adjust = ((float)(adjust_raw10 / 10) - 1024.0) / 2048; //  -1.0 ~ +1.0
 
-  float offset_deg = adjust * 20;
-
-  if (timer_100Hz) {
-    timer_100Hz = false;
-    servo_write(control_curve_degree(stick_normalized())+offset_deg);
-    //servo_write(offset_deg);
-  }
+  return adjust * 20;
 }
 
 void servo_write(float degree) { //get degree -range_deg ~ +range_deg, control servo
@@ -90,13 +91,4 @@ float stick_normalized() { //return -1 ~ +1
   float stick_y = ((float)stick_y_raw10 / 10 - stick_y_zero_raw) / 2048.0;
   float len = sqrt(stick_x * stick_x + stick_y * stick_y);
   return (len * cos(atan2(stick_y, stick_x) - phase_rad));
-}
-
-void timerIsr()
-{
-  if (timer_100Hz) {
-    //Serial.println("100Hz overrun");
-  } else {
-    timer_100Hz = true;
-  }
 }
