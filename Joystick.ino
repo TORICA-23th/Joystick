@@ -40,7 +40,7 @@ void loop() {
   if (now_time - last_time >= 10) {
     last_time = now_time;
 
-    servo_write(read_offset_deg() + control_curve_degree(stick_normalized()));
+    servo_write(read_offset_deg() + control_curve_deg(stick_normalized()));
   }
 }
 
@@ -64,7 +64,7 @@ void servo_write(float degree) { //get degree -range_deg ~ +range_deg, control s
   //Serial.println(servo_val);
 }
 
-float control_curve_degree(float val_normalized) { //get -1 ~ +1 , return degree -range_deg ~ +range_deg
+float control_curve_deg(float val_normalized) { //get -1 ~ +1 , return degree -range_deg ~ +range_deg
   //float degree = val_normalized * abs(val_normalized) * range_deg;
   float degree = val_normalized * range_deg;
   if (degree >= range_deg) {
