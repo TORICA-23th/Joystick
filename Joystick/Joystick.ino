@@ -9,7 +9,7 @@ const float range_deg = 15.0; // -range_deg ~ +range_deg
 const float max_offset_deg = 10.0;
 
 // ジョイスティックの操作方向指定
-const float phase_rad = (3.14 / 4);    //3.14 / 4;
+const float phase_rad = (3.14 / 2);    //3.14 / 4;
 //      y
 //      |  pi/4
 //      | /
@@ -32,8 +32,13 @@ const int servo_zero_pos = 7500;
 void setup() {
   analogReadResolution(12);
   krs.begin();  //サーボモータの通信初期設定
+  pinMode(16, OUTPUT);
+  pinMode(25, OUTPUT);
+  pinMode(17, OUTPUT);
 }
 
+
+bool LED;
 void loop() {
   uint32_t now_time = millis();
   static uint32_t last_time = 0;
@@ -41,6 +46,16 @@ void loop() {
     last_time = now_time;
 
     servo_write(read_offset_deg() + control_curve_deg(stick_normalized()));
+  }
+
+  uint32_t LEDnow_time = millis();
+  static uint32_t LEDlast_time = 0;
+  if (LEDnow_time - LEDlast_time >= 100) {
+    LEDlast_time = LEDnow_time;
+    LED = !LED;
+    digitalWrite(16, LED);
+    digitalWrite(17, LED);
+    digitalWrite(25, LED);
   }
 }
 
