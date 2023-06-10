@@ -5,7 +5,7 @@
 #define LED_BLUE    PIN_LED_RXL
 
 // 動作範囲・オフセット範囲設定
-const float range_deg = 15.0; // -range_deg ~ +range_deg
+const float range_deg = 30.0; // -range_deg ~ +range_deg
 const float max_offset_deg = 10.0;
 
 // ジョイスティックの操作方向指定
