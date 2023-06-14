@@ -64,7 +64,7 @@ float read_offset_deg() {
   for (int i = 0; i < 10; i++) {
     adjust_raw10 += analogRead(ADJUST);
   }
-  float adjust = ((float)(adjust_raw10 / 10) - 1024.0) / 2048; //  -1.0 ~ +1.0
+  float adjust = ((float)(adjust_raw10 / 10) - 2048.0) / 2048.0; //  -1.0 ~ +1.0
 
   return adjust * 20;
 }
