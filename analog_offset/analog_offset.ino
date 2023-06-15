@@ -9,7 +9,7 @@ const float range_deg = 30.0; // -range_deg ~ +range_deg
 const float max_offset_deg = 20.0;
 
 // ジョイスティックの操作方向指定
-const float phase_rad = (3.14 / 4);    //3.14 / 4;
+const float phase_rad = (3.14 / 2);    //3.14 / 4;
 //      y
 //      |  pi/4
 //      | /
