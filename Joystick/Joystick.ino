@@ -6,7 +6,7 @@
 
 // 動作範囲・オフセット範囲設定
 const float range_deg = 30.0; // -range_deg ~ +range_deg
-const float max_offset_deg = 10.0;
+const float max_offset_deg = 30.0;
 
 // ジョイスティックの操作方向指定
 const float phase_rad = (3.14 / 2);    //3.14 / 4;
