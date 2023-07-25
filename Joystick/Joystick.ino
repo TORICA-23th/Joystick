@@ -66,7 +66,7 @@ float read_offset_deg() {
   }
   float adjust = ((float)(adjust_raw10 / 10) - 2048.0) / 2048.0; //  -1.0 ~ +1.0
 
-  return adjust * 20;
+  return adjust * max_offset_deg;
 }
 
 void servo_write(float degree) { //get degree -range_deg ~ +range_deg, control servo
