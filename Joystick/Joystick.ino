@@ -60,11 +60,11 @@ void loop() {
 }
 
 float read_offset_deg() {
-  uint32_t adjust_raw10 = 0;
-  for (int i = 0; i < 10; i++) {
-    adjust_raw10 += analogRead(ADJUST);
+  uint32_t adjust_raw40 = 0;
+  for (int i = 0; i < 40; i++) {
+    adjust_raw40 += analogRead(ADJUST);
   }
-  float adjust = ((float)(adjust_raw10 / 10) - 2048.0) / 2048.0; //  -1.0 ~ +1.0
+  float adjust = ((float)(adjust_raw40 / 40) - 2048.0) / 2048.0; //  -1.0 ~ +1.0
 
   return adjust * max_offset_deg;
 }
